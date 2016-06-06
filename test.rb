@@ -13,7 +13,7 @@
 def successfn(index)
   @Tasks[index][:status] = "Success"
   puts @Tasks.length
-  if (index+1 < @Tasks.length)
+  if (index+1 < @Tasks.length ) 
       @Tasks[index+1][:status]="Started and Running...."
   end
   #displayStatus()
