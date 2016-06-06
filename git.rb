@@ -24,7 +24,7 @@
 # Displaying over all status
 def displayStatus()
   @counter=1
-
+  puts "\n\n\n"
   puts "                     ****   Tasks  ****                                       "
   puts "__________________________________________________________________________\n\n"
   @Tasks.each  do | task |
