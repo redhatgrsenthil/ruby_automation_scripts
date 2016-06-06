@@ -26,13 +26,13 @@ def displayStatus()
   @counter=1
   puts "\n\n__________________________________________________________________________\n"
   puts "                             Tasks                                             "
-  puts "____________________________________________________________________________\n\n"
+  puts "    __________________________________________________________________________\n\n"
   @Tasks.each  do | task |
     printf "%d - %-50s %s",@counter,task[:Task],task[:status]
     puts "\n"
     @counter=@counter+1
   end
-  puts "\n\n____________________________________________________________________________\n"
+  puts "\n\n__________________________________________________________________________\n"
 end
 
 # function - cleaning up the work space
@@ -138,9 +138,7 @@ def updatePomSnapshot()
   puts "[INFO] Updating to Release Version"
   #Changing pom version
   system("mvn -DnewVersion=#{$newPomversion} versions:set")
-  system("mvn clean install")
-
-  #constructing xml tag with version Ex:<version>1.25.3-SNAPSHOT</version>
+    #constructing xml tag with version Ex:<version>1.25.3-SNAPSHOT</version>
   $newPomXml="<version>#{$newPomversion}</version>"
   $validVersionFound=`grep -m 1 "#{$newPomXml}" pom.xml`
 
@@ -156,7 +154,7 @@ end
 # function - excuting the maven profiles
 def deployProfile
     system("mvn clean install")
-    system("mvn clean -P buildCore,deployCore")
+    #system("mvn clean -P buildCore,deployCore")
     lastCmdStatus=`$?`
     if (lastCmdStatus == "0")
       puts "[INFO] Maven profile succssfully deployed"
@@ -209,6 +207,6 @@ mergeBrach(@releaseBranchName,@tempBranchName) ? successfn(5):failfn(5)
 updatePomSnapshot() ? successfn(6):failfn(6)
 
 #7. Deploy some profile
-#deployProfile()? successfn(7):failfn(7)
+deployProfile()? successfn(7):failfn(7)
 
 displayStatus()
