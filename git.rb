@@ -157,11 +157,11 @@ def deployProfile
     #system("mvn clean -P buildCore,deployCore")
 
     if ( $?.exitstatus > 0 )
-      puts "\n\n[INFO] Maven profile succssfully deployed"
-      return true
-    else
       puts "\n\n[ERROR] Maven profile not deployed"
       return false
+    else
+      puts "\n\n[INFO] Maven profile succssfully deployed"
+      return true
     end
 end
 
