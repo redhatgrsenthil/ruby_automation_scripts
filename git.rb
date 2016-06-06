@@ -24,9 +24,9 @@
 # Displaying over all status
 def displayStatus()
   @counter=1
-  puts "\n\n__________________________________________________________________________\n"
-  puts "                             Tasks                                             "
-  puts "    __________________________________________________________________________\n\n"
+
+  puts "                     ****   Tasks  ****                                       "
+  puts "__________________________________________________________________________\n\n"
   @Tasks.each  do | task |
     printf "%d - %-50s %s",@counter,task[:Task],task[:status]
     puts "\n"
@@ -41,10 +41,10 @@ def gitCleanUp()
     system("git clean -df")
     $result=`git ls-files --others --exclude-standard`
     if($result=="")
-        puts "[INFO] No UnTracked files"
+        puts "\n\n[INFO] No UnTracked files"
         return true
     else
-        puts "[ERROR] gitCleanup Failed-Directory has Untracked files"
+        puts "\n\n[ERROR] gitCleanup Failed-Directory has Untracked files"
         return false
     end
 
@@ -60,10 +60,10 @@ def checkoutBranch(branch)
     system("git reset --hard #{branch}")
 
     if($currentBranchName.strip.eql?(branch.strip))
-      puts "The branch name #{branch} is sccessfully checkout "
+      puts "\n\n[INFO] The branch name #{branch} is sccessfully checkout "
       return true
      else
-      puts "Got issue while checking out the branch:#{branch}"
+      puts "\n\n[ERROR] Got issue while checking out the branch:#{branch}"
       return false
     end
 end
@@ -73,10 +73,10 @@ def createBranch(newBranch)
     system("git checkout -b #{newBranch}")
     $newBranchName=`git rev-parse --abbrev-ref HEAD`
     if($newBranchName.strip.eql?(newBranch.strip))
-      puts "The branch name #{newBranch} has been sccessfully Created "
+      puts "\n\n[INFO] The branch name #{newBranch} has been sccessfully Created "
       return true
     else
-      puts "Got issue while createing new branch:#{newBranch}"
+      puts "\n\n[ERROR] Got issue while createing new branch:#{newBranch}"
       return false
     end
 end
@@ -86,10 +86,10 @@ def validateGitContext(branch)
     # prove that it's validated, because this is how you test your function!
       $result=`git log master^..origin/master  --pretty=format:"'%h %d'"`
     if($result.include?("origin/master" && "master"))
-        puts "[INFO] you are on the latest version of #{branch}"
+        puts "\n\n[INFO] you are on the latest version of #{branch}"
         return true
     else
-        puts "[ERROR] something went wrong you are not up to date on #{branch}"
+        puts "\n\n[ERROR] something went wrong you are not up to date on #{branch}"
         return false
     end
 end
@@ -104,10 +104,10 @@ def mergeBrach(from,to)
    merge_status=`git diff --name-only --diff-filter=U`
 
    if(merge_status.strip != "")
-       puts "\n[INFO] merge conflict occured, Please do it through manual merge\n\n"
+       puts "\n\n[ERROR] merge conflict occured, Please do it through manual merge\n\n"
        return false
    else
-       puts "\n[INFO] The branch has been merged successfully"
+       puts "\n\n[INFO] The branch has been merged successfully"
        return true
    end
 
@@ -120,10 +120,10 @@ def validateHeadofBranch(branch)
     puts "[INFO] validating head of master: #{branch}"
     $result=`git branch -a --contains origin/master | grep origin/$branch`
     if( $result.include? branch )
-      puts "[INFO] validating head of master: #{branch}"
+      puts "\n\n[INFO] validating head of master: #{branch}"
       return true
     else
-      puts "[INFO] something went wrong on validateHeadofBranch: #{branch}"
+      puts "\n\n[ERROR] something went wrong on validateHeadofBranch: #{branch}"
       return false
     end
 end
@@ -143,10 +143,10 @@ def updatePomSnapshot()
   $validVersionFound=`grep -m 1 "#{$newPomXml}" pom.xml`
 
   if( $validVersionFound =="")
-    puts "Pom snapshot is not updated properly"
+    puts "\n\n [ERROR] Pom snapshot is not updated properly"
     return false
   else
-    puts "Pom snapshot is updated properly"
+    puts "\n\n [INFO] Pom snapshot is updated properly"
     return true
   end
 end
@@ -155,12 +155,12 @@ end
 def deployProfile
     system("mvn clean install")
     #system("mvn clean -P buildCore,deployCore")
-    lastCmdStatus=`$?`
-    if (lastCmdStatus == "0")
-      puts "[INFO] Maven profile succssfully deployed"
+
+    if ( $?.exitstatus > 0 )
+      puts "\n\n[INFO] Maven profile succssfully deployed"
       return true
     else
-      puts "[INFO] Maven profile not deployed"
+      puts "\n\n[ERROR] Maven profile not deployed"
       return false
     end
 end
