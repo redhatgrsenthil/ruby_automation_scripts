@@ -174,7 +174,9 @@ end
 
 def successfn(index)
   @Tasks[index][:status] = "Success"
-  @Tasks[index+1][:status]="Started and Running...."
+  if(index < @Tasks.length )
+    @Tasks[index+1][:status]="Started and Running...."
+  end
   displayStatus()
 end
 
