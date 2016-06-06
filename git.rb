@@ -22,7 +22,7 @@
 @tempBranchName="#{@releaseBranchName}_#{@time.year}#{@time.month}#{@time.day}_#{@time.hour}_#{@time.min}_#{@time.sec}"
 
 # Displaying over all status
-def dispplayStatus()
+def displayStatus()
   @counter=1
   puts "\n\n__________________________________________________________________________\n"
   puts "                             Tasks                                             "
@@ -167,8 +167,8 @@ end
 def failfn(index)
   #puts "failed and Aborted"
   @Tasks[index][:status] = "Failed"
-  dispplayStatus()
-  sys.exit()
+  displayStatus()
+  exit
 end
 
 def successfn(index)
@@ -181,7 +181,7 @@ end
 ##
 ##############################################
 
-dispplayStatus()
+displayStatus()
 
 gitCleanUp() ? successfn(0):failfn(0)
 
@@ -206,4 +206,4 @@ updatePomSnapshot() ? successfn(6):failfn(6)
 #7. Deploy some profile
 deployProfile()? successfn(7):failfn(7)
 
-dispplayStatus()
+displayStatus()
