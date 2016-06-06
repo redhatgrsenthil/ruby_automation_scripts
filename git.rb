@@ -17,21 +17,22 @@
 @date = Time.now.strftime("%Y%m%d")
 
 #Generating temporary branch name
+# Ex: BR_RELESE_TEST_20160501_12_30_12
 @time=Time.new
-@tempBranchName="tempBranch_#{@time.year}#{@time.month}#{@time.day}_#{@time.hour}_#{@time.min}_#{@time.sec}"
+@tempBranchName="#{@releaseBranchName}_#{@time.year}#{@time.month}#{@time.day}_#{@time.hour}_#{@time.min}_#{@time.sec}"
 
 # Displaying over all status
-def dispStatus()
+def dispplayStatus()
   @counter=1
-  puts "\n\n########################################################################\n"
-  puts "                            Tasks                                         "
-  puts "########################################################################\n\n"
+  puts "\n\n__________________________________________________________________________\n"
+  puts "                             Tasks                                             "
+  puts "_______________________________________________________________________________\n\n"
   @Tasks.each  do | task |
     printf "%d - %-50s %s",@counter,task[:Task],task[:status]
     puts "\n"
     @counter=@counter+1
   end
-  puts "\n\n########################################################################\n"
+  puts "\n\n____________________________________________________________________________\n"
 end
 
 # function - cleaning up the work space
@@ -98,6 +99,15 @@ def mergeBrach(from,to)
     system("git tag -a TAG_BEFORE_MERGE_FROM_#{from}_TO_#{to}_#{@date} -m before_merge_from_#{from}_to_#{to}")
     system("git merge  #{sourceBranch} --no-commit --no-ff")
     system("git tag -a TAG_AFTER_MERGE_FROM_#{from}_TO_#{to}_#{@date} -m before_merge_from_#{from}_to_#{to}")
+    ###### Condition to check merge conflict
+   merge_status=`cd #{@wem_checkout} && git diff --name-only --diff-filter=U`
+
+   if(merge_status.strip != "")
+       puts "\n[INFO] merge conflict occured, Please do it through manual merge\n\n"
+   else
+       puts "\n[INFO] The branch has been merged successfully"
+   end
+
 
     # need to validate confilict files
 end
@@ -144,12 +154,21 @@ end
 def deployProfile
     system("mvn clean install")
     system("mvn clean -P buildCore,deployCore")
+    lastCmdStatus=`$?`
+    if (lastCmdStatus == "0")
+      puts "[INFO] Maven profile succssfully deployed"
+      return true
+    else
+      puts "[INFO] Maven profile not deployed"
+      return false
+    end
 end
 
 def failfn(index)
   #puts "failed and Aborted"
-  @Tasks[0][:status] = "Failed"
-  dispStatus()
+  @Tasks[index][:status] = "Failed"
+  dispplayStatus()
+  sys.exit()
 end
 
 def successfn(index)
@@ -162,7 +181,7 @@ end
 ##
 ##############################################
 
-dispStatus()
+dispplayStatus()
 
 gitCleanUp() ? successfn(0):failfn(0)
 
@@ -184,4 +203,7 @@ mergeBrach(@releaseBranchName,@tempBranchName) ? successfn(5):failfn(5)
 #6.Updating pom version
 updatePomSnapshot() ? successfn(6):failfn(6)
 
-dispStatus()
+#7. Deploy some profile
+deployProfile()? successfn(7):failfn(7)
+
+dispplayStatus()
