@@ -26,7 +26,7 @@ def displayStatus()
   @counter=1
   puts "\n\n__________________________________________________________________________\n"
   puts "                             Tasks                                             "
-  puts "_______________________________________________________________________________\n\n"
+  puts "____________________________________________________________________________\n\n"
   @Tasks.each  do | task |
     printf "%d - %-50s %s",@counter,task[:Task],task[:status]
     puts "\n"
@@ -58,7 +58,8 @@ def checkoutBranch(branch)
     $currentBranchName=`git rev-parse --abbrev-ref HEAD`
     system("git pull")
     system("git reset --hard #{branch}")
-    if($currentBranchName==branch)
+
+    if($currentBranchName.strip.eql?(branch.strip))
       puts "The branch name #{branch} is sccessfully checkout "
       return true
      else
@@ -71,7 +72,7 @@ end
 def createBranch(newBranch)
     system("git checkout -b #{newBranch}")
     $newBranchName=`git rev-parse --abbrev-ref HEAD`
-    if($newBranchName==newBranch)
+    if($newBranchName.strip.eql?(newBranch.strip))
       puts "The branch name #{newBranch} has been sccessfully Created "
       return true
     else
@@ -97,15 +98,17 @@ end
 def mergeBrach(from,to)
     # prove that it's validated, because this is how you test your function!
     system("git tag -a TAG_BEFORE_MERGE_FROM_#{from}_TO_#{to}_#{@date} -m before_merge_from_#{from}_to_#{to}")
-    system("git merge  #{sourceBranch} --no-commit --no-ff")
+    system("git merge  #{from} --no-commit --no-ff")
     system("git tag -a TAG_AFTER_MERGE_FROM_#{from}_TO_#{to}_#{@date} -m before_merge_from_#{from}_to_#{to}")
     ###### Condition to check merge conflict
-   merge_status=`cd #{@wem_checkout} && git diff --name-only --diff-filter=U`
+   merge_status=`git diff --name-only --diff-filter=U`
 
    if(merge_status.strip != "")
        puts "\n[INFO] merge conflict occured, Please do it through manual merge\n\n"
+       return false
    else
        puts "\n[INFO] The branch has been merged successfully"
+       return true
    end
 
 
@@ -141,7 +144,7 @@ def updatePomSnapshot()
   $newPomXml="<version>#{$newPomversion}</version>"
   $validVersionFound=`grep -m 1 "#{$newPomXml}" pom.xml`
 
-  if( validVersionFound =="")
+  if( $validVersionFound =="")
     puts "Pom snapshot is not updated properly"
     return false
   else
@@ -173,6 +176,8 @@ end
 
 def successfn(index)
   @Tasks[index][:status] = "Success"
+  @Tasks[index+1][:status]="Started and Running...."
+  displayStatus()
 end
 
 
@@ -204,6 +209,6 @@ mergeBrach(@releaseBranchName,@tempBranchName) ? successfn(5):failfn(5)
 updatePomSnapshot() ? successfn(6):failfn(6)
 
 #7. Deploy some profile
-deployProfile()? successfn(7):failfn(7)
+#deployProfile()? successfn(7):failfn(7)
 
 displayStatus()
